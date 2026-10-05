@@ -1,0 +1,5 @@
+crystal_1000_work/
+data_crystal_1000/*.log
+__pycache__/
+*.pyc
+output/
