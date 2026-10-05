@@ -33,13 +33,23 @@ fi
 CONTAINER_BIN="singularity"
 command -v singularity >/dev/null 2>&1 || CONTAINER_BIN="apptainer"
 
-export TEST73_DEVICE=cuda
-export TEST73_HIDDEN_DIM="${TEST73_HIDDEN_DIM:-128}"
-export TEST73_N_LAYERS="${TEST73_N_LAYERS:-4}"
-export TEST73_BATCH_SIZE="${TEST73_BATCH_SIZE:-32}"
-export TEST73_N_STEPS="${TEST73_N_STEPS:-50000}"
+# SINGULARITYENV_<NAME> is how Singularity/Apptainer passes a host
+# environment variable through to the container as <NAME> -- the bare
+# "--env VAR1,VAR2" form used previously is invalid syntax (--env expects
+# KEY=VALUE pairs) and caused "error for command 'exec'".
+export SINGULARITYENV_TEST73_DEVICE=cuda
+export SINGULARITYENV_TEST73_HIDDEN_DIM="${TEST73_HIDDEN_DIM:-128}"
+export SINGULARITYENV_TEST73_N_LAYERS="${TEST73_N_LAYERS:-4}"
+export SINGULARITYENV_TEST73_BATCH_SIZE="${TEST73_BATCH_SIZE:-32}"
+export SINGULARITYENV_TEST73_N_STEPS="${TEST73_N_STEPS:-50000}"
+# Apptainer uses the APPTAINERENV_ prefix instead; set both so either
+# container runtime picks it up.
+export APPTAINERENV_TEST73_DEVICE=cuda
+export APPTAINERENV_TEST73_HIDDEN_DIM="${TEST73_HIDDEN_DIM:-128}"
+export APPTAINERENV_TEST73_N_LAYERS="${TEST73_N_LAYERS:-4}"
+export APPTAINERENV_TEST73_BATCH_SIZE="${TEST73_BATCH_SIZE:-32}"
+export APPTAINERENV_TEST73_N_STEPS="${TEST73_N_STEPS:-50000}"
 
 "$CONTAINER_BIN" exec --nv \
-    --env TEST73_DEVICE,TEST73_HIDDEN_DIM,TEST73_N_LAYERS,TEST73_BATCH_SIZE,TEST73_N_STEPS \
     --bind "$WORK_DIR:$WORK_DIR" \
     "$SIF_IMAGE" python "$WORK_DIR/train_and_export.py"
